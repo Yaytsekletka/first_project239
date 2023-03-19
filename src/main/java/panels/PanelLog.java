@@ -33,6 +33,10 @@ public class PanelLog extends GridPanel {
      */
     private static final int MAX_LOG_LINE_LENGTH = 80;
     /**
+     * Цвет текста
+     */
+    public static final int MULTILINE_TEXT_COLOR = Misc.getColor(64, 255, 255, 255);
+    /**
      * Тип записи
      */
     enum RecordType {

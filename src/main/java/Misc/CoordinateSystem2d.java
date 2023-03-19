@@ -1,5 +1,9 @@
 package Misc;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 /**
@@ -50,7 +54,8 @@ public class CoordinateSystem2d {
      * @param min минимальные координаты
      * @param max максимальные координаты
      */
-    public CoordinateSystem2d(Vector2d min, Vector2d max) {
+    @JsonCreator
+    public CoordinateSystem2d(@JsonProperty("min") Vector2d min, @JsonProperty("max") Vector2d max) {
         this(min.x, min.y, max.x - min.x, max.y - min.y);
     }
 
@@ -75,6 +80,7 @@ public class CoordinateSystem2d {
      *
      * @return случайные координаты внутри СК
      */
+    @JsonIgnore
     public Vector2d getRandomCoords() {
         Vector2d r = Vector2d.rand(min, max);
         return r;
@@ -168,6 +174,7 @@ public class CoordinateSystem2d {
      *
      * @return минимальная координата
      */
+    @JsonIgnore
     public Vector2d getMin() {
         return min;
     }

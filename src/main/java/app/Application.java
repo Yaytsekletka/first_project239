@@ -1,5 +1,6 @@
 package app;
 
+import controls.InputFactory;
 import io.github.humbleui.jwm.*;
 import io.github.humbleui.jwm.skija.EventFrameSkija;
 import io.github.humbleui.skija.Canvas;
@@ -174,6 +175,7 @@ public class Application implements Consumer<Event> {
                             return;
 
                         }
+                        case TAB -> InputFactory.nextTab();
                     }
             }
         }

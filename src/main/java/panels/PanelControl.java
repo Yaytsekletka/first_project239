@@ -1,12 +1,16 @@
 package panels;
 
 import app.Task;
+
+import java.awt.*;
 import java.util.ArrayList;
 import controls.Input;
 import controls.InputFactory;
 import controls.Label;
 import controls.MultiLineLabel;
 import io.github.humbleui.jwm.*;
+import io.github.humbleui.jwm.Event;
+import io.github.humbleui.jwm.Window;
 import io.github.humbleui.skija.Canvas;
 import Misc.CoordinateSystem2i;
 import Misc.Vector2i;
@@ -69,14 +73,14 @@ public class PanelControl extends GridPanel {
         labels.add(xLabel);
         Input xField = InputFactory.getInput(window, false, FIELD_BACKGROUND_COLOR, PANEL_PADDING,
                 6, 7, 1, 2, 2, 1, "0.0", true,
-                FIELD_TEXT_COLOR);
+                FIELD_TEXT_COLOR, true);
         inputs.add(xField);
         Label yLabel = new Label(window, false, backgroundColor, PANEL_PADDING,
                 6, 7, 3, 2, 1, 1, "Y", true, true);
         labels.add(yLabel);
         Input yField = InputFactory.getInput(window, false, FIELD_BACKGROUND_COLOR, PANEL_PADDING,
                 6, 7, 4, 2, 2, 1, "0.0", true,
-                FIELD_TEXT_COLOR);
+                FIELD_TEXT_COLOR, true);
         inputs.add(yField);
     }
 
@@ -94,12 +98,22 @@ public class PanelControl extends GridPanel {
             for (Input input : inputs)
                 input.accept(ee);
 
+            for (Button button : buttons) {
+                if (lastWindowCS != null)
+                    button.checkOver(lastWindowCS.getRelativePos(new Vector2i(ee)));
+            }
             // событие нажатия мыши
         } else if (e instanceof EventMouseButton ee) {
-            if (!lastInside || !ee.isPressed())
+            if (!lastInside)
                 return;
 
             Vector2i relPos = lastWindowCS.getRelativePos(lastMove);
+
+            // пробуем кликнуть по всем кнопкам
+            for (Button button : buttons) {
+                if (ee.isPressed())
+                    button.click(relPos);
+            }
 
             // перебираем поля ввода
             for (Input input : inputs) {

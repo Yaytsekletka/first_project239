@@ -135,6 +135,9 @@ public class Application implements Consumer<Event> {
             paint(s.getCanvas(), new CoordinateSystem2i(0, 0, s.getWidth(), s.getHeight())
             );
         }
+        panelControl.accept(e);
+        panelRendering.accept(e);
+        panelLog.accept(e);
     }
 
     /**

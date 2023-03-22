@@ -5,6 +5,7 @@ import app.Task;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.humbleui.jwm.Event;
 import io.github.humbleui.jwm.EventMouseButton;
+import io.github.humbleui.jwm.EventMouseScroll;
 import io.github.humbleui.jwm.Window;
 import io.github.humbleui.skija.Canvas;
 import Misc.CoordinateSystem2d;
@@ -76,8 +77,14 @@ public class PanelRendering extends GridPanel {
                     // обрабатываем клик по задаче
                     task.click(lastWindowCS.getRelativePos(lastMove), ee.getButton());
             }
+
+        } else if (e instanceof EventMouseScroll ee) {
+            if (lastMove != null && lastInside)
+                task.scale(ee.getDeltaY(), lastWindowCS.getRelativePos(lastMove));
+            window.requestFrame();
         }
     }
+
     /**
      * Сохранить файл
      */
@@ -91,6 +98,7 @@ public class PanelRendering extends GridPanel {
             PanelLog.error("не получилось записать файл \n" + e);
         }
     }
+
     /**
      * Загрузить файл
      */
@@ -99,6 +107,7 @@ public class PanelRendering extends GridPanel {
         PanelLog.info("load from " + path);
         loadFromFile(path);
     }
+
     /**
      * Загружаем из файла
      *
@@ -115,6 +124,7 @@ public class PanelRendering extends GridPanel {
             PanelLog.error("Не получилось прочитать файл " + path + "\n" + e);
         }
     }
+
     /**
      * Метод под рисование в конкретной реализации
      *

@@ -73,6 +73,7 @@ public class PanelRendering extends GridPanel {
      * @param e событие
      */
     @Override
+
     public void accept(Event e) {
         // вызов обработчика предка
         super.accept(e);

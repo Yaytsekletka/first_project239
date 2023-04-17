@@ -58,7 +58,7 @@ public class Task {
     /**
      * Размер точки
      */
-    private static final int POINT_SIZE = 3;
+    private static final int POINT_SIZE = 2;
     /**
      * последняя СК окна
      */
@@ -166,7 +166,7 @@ public class Task {
                 // а в классическом представлении - вверх
                 Vector2i windowPos = windowCS.getCoords(c.centre.x, c.centre.y, ownCS);
                 // рисуем точку
-                canvas.drawRect(Rect.makeXYWH(windowPos.x - POINT_SIZE, lastWindowCS.getMax().y - (windowPos.y - POINT_SIZE), POINT_SIZE * 2, POINT_SIZE * 2), paint);
+                canvas.drawRect(Rect.makeXYWH(windowPos.x - POINT_SIZE, lastWindowCS.getMax().y - (windowPos.y + POINT_SIZE), POINT_SIZE*2 , POINT_SIZE*2 ), paint);
                 // рисуем окружность
                 float[] points = arrCircle(c.centre, c.radius);
                 canvas.drawLines(points, paint);
@@ -278,11 +278,15 @@ public class Task {
      */
     public void click(Vector2i pos, MouseButton mouseButton) {
         if (lastWindowCS == null) return;
+        // переворачиваем y
+        Vector2i pos1 = new Vector2i(pos.x, lastWindowCS.getMax().y - pos.y);
         // получаем положение на экране
-        Vector2d taskPos = ownCS.getCoords(pos, lastWindowCS);
+        Vector2d taskPos = ownCS.getCoords(pos1, lastWindowCS);
         // если левая кнопка мыши, добавляем в первое множество
+        double tmpR = ThreadLocalRandom.current().nextDouble(0, Math.min(ownCS.getSize().x, ownCS.getSize().y) / 2);
         if (mouseButton.equals(MouseButton.PRIMARY)) {
            // addPoint(taskPos, Point.PointSet.FIRST_SET);
+            addCircle(taskPos, tmpR);
             // если правая, то во второе
         } else if (mouseButton.equals(MouseButton.SECONDARY)) {
            // addPoint(taskPos, Point.PointSet.SECOND_SET);

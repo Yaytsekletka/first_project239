@@ -139,22 +139,25 @@ public class PanelControl extends GridPanel {
         inputs.add(y2Field);
 
 
-        Button addToFirstSet = new Button(
+
+        Button addCircle = new Button(
                 window, false, backgroundColor, PANEL_PADDING,
-                6, 9, 0, 3, 6, 1, "Добавить окружность",
+                6, 9, 0, 3, 6, 1, "Добавить\nокружность",
                 true, true);
-        addToFirstSet.setOnClick(() -> {
+        addCircle.setOnClick(() -> {
             // если числа введены верно
             if (!xField.hasValidDoubleValue()) {
                 PanelLog.warning("X координата введена неверно");
-            } else if (!yField.hasValidDoubleValue())
+            } else if (!yField.hasValidDoubleValue()) {
                 PanelLog.warning("Y координата введена неверно");
-            else
-                PanelRendering.task.addPoint(
-                        new Vector2d(xField.doubleValue(), yField.doubleValue()), Point.PointSet.FIRST_SET
-                );
+            } else if (!RField.hasValidDoubleValue())
+                PanelLog.warning("радиус введен неверно");
+            else {
+                PanelRendering.task.addCircle(
+                        new Vector2d(xField.doubleValue(), yField.doubleValue()), RField.doubleValue());
+            }
         });
-        buttons.add(addToFirstSet);
+        buttons.add(addCircle);
 
         Button addToSecondSet = new Button(
                 window, false, backgroundColor, PANEL_PADDING,
@@ -167,9 +170,8 @@ public class PanelControl extends GridPanel {
             } else if (!yField.hasValidDoubleValue())
                 PanelLog.warning("Y координата введена неверно");
             else {
-                PanelRendering.task.addPoint(
-                        new Vector2d(xField.doubleValue(), yField.doubleValue()), Point.PointSet.SECOND_SET
-                );
+               // PanelRendering.task.addPoint(
+                   //     new Vector2d(xField.doubleValue(), yField.doubleValue()), Point.PointSet.SECOND_SET);
             }
         });
         buttons.add(addToSecondSet);
@@ -193,7 +195,7 @@ public class PanelControl extends GridPanel {
             if (!cntField.hasValidIntValue()) {
                 PanelLog.warning("кол-во точек указано неверно");
             } else {
-                PanelRendering.task.addRandomPoints(cntField.intValue());
+               // PanelRendering.task.addRandomPoints(cntField.intValue());
             }
         });
 

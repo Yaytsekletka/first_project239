@@ -148,7 +148,71 @@ public class Vector2d {
         // объекты совпадают тогда и только тогда, когда совпадают их координаты
         return Double.compare(vector2d.y, y) == 0;
     }
+    /**
+     * Конструктор вектора создаёт вектор
+     */
+    public Vector2d(Vector2i v) {
+        this.x = v.x;
+        this.y = v.y;
+    }
+    /**
+     * Повернуть вектор
+     *
+     * @param a угол
+     * @return повёрнутый вектор
+     */
+    public Vector2d rotated(double a) {
+        return new Vector2d(
+                x * Math.cos(a) - y * Math.sin(a),
+                x * Math.sin(a) + y * Math.cos(a)
+        );
+    }
+    /**
+     * Векторное умножение векторов
+     *
+     * @param v второй вектор
+     * @return результат умножения
+     */
+    public double cross(Vector2d v) {
+        return this.x * v.y - this.y * v.x;
+    }
+    /**
+     * Умножение вектора на число
+     *
+     * @param v вектор
+     * @param s число
+     * @return результат умножения
+     */
+    public static Vector2i mult(Vector2i v, int s) {
+        return new Vector2i(v.x * s, v.y * s);
+    }
+    /**
+     * Умножение вектора на число
+     *
+     * @param s число
+     */
+    public void mult( int s) {
+        this.x*=s;
+        this.y*=s;
+    }
 
+    /**
+     * Нормализация вектора
+     *
+     * @return нормированный вектор
+     */
+    public Vector2d norm() {
+        double length = length();
+        return new Vector2d(x / length, y / length);
+    }
+    /**
+     * Получить целочисленный вектор
+     *
+     * @return целочисленный вектор
+     */
+    public Vector2i intVector() {
+        return new Vector2i((int) this.x, (int) this.y);
+    }
     /**
      * Получить хэш-код объекта
      *

@@ -12,6 +12,7 @@ import Misc.CoordinateSystem2i;
 import Misc.Vector2i;
 import lombok.Getter;
 import panels.PanelLog;
+import Misc.Misc;
 
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
@@ -39,22 +40,16 @@ public class Task {
     @Getter
     private final CoordinateSystem2d ownCS;
     /**
-     * Список точек
+     * Список окружностей
      */
     @Getter
     private final ArrayList<Circle> circles;
     /**
-     * Список точек в пересечении
+     * Список лучей
      */
     @Getter
-    @JsonIgnore
-    private final ArrayList<Point> crossed;
-    /**
-     * Список точек в разности
-     */
-    @Getter
-    @JsonIgnore
-    private final ArrayList<Point> single;
+    private final ArrayList<Ray> rays;
+
     /**
      * Размер точки
      */
@@ -88,12 +83,14 @@ public class Task {
     @JsonCreator
     public Task(
             @JsonProperty("ownCS") CoordinateSystem2d ownCS,
-            @JsonProperty("circles") ArrayList<Circle> circles
+            @JsonProperty("circles") ArrayList<Circle> circles,
+            @JsonProperty("circles") ArrayList<Ray> rays
+
     ) {
         this.ownCS = ownCS;
         this.circles = circles;
-        this.crossed = new ArrayList<>();
-        this.single = new ArrayList<>();
+        this.rays = rays;
+
     }
 
     /**
@@ -151,6 +148,45 @@ public class Task {
 
     }
     /**
+     * Рисование луча
+     *
+     * @param pos1 положение первой точки
+     * @param pos2 положение второй точки
+     */
+    public void paintRay(Canvas canvas,Vector2i pos1, Vector2i pos2, Paint p, int maxDist) {
+        // отрезок AB
+        Vector2i AB = Vector2i.subtract(pos1, pos2);
+
+        // создаём вектор направления для рисования условно бесконечной полосы
+        Vector2d dir = new Vector2d(AB);
+        //System.out.print("fx:"+dir.x+" fy:"+dir.y);
+        dir = dir.rotated(Math.PI/2).norm();
+        dir.mult(maxDist);
+        Vector2i direction = new Vector2i((int)dir.x,(int)dir.y);
+        // получаем точки рисования
+        //System.out.println(" x:"+dir.x+" y:"+dir.y);
+        Vector2i renderPointC = Vector2i.sum(pos1, direction);
+        Vector2i renderPointD = Vector2i.sum(pos2, direction);
+
+        // рисуем отрезки
+        canvas.drawLine(pos1.x, pos1.y, pos2.x, pos2.y, p);
+        canvas.drawLine(pos1.x, pos1.y, renderPointC.x, renderPointC.y, p);
+        canvas.drawLine(pos2.x, pos2.y, renderPointD.x, renderPointD.y, p);
+        // сохраняем цвет рисования
+        int paintColor = p.getColor();
+        // задаём красный цвет
+        p.setColor(Misc.getColor(200, 255, 0, 0));
+        // рисуем исходные точки
+        canvas.drawRRect(RRect.makeXYWH(pos1.x - 4, pos1.y - 4, 8, 8, 4), p);
+        canvas.drawRRect(RRect.makeXYWH(pos2.x - 4, pos2.y - 4, 8, 8, 4), p);
+        p.setColor(Misc.getColor(200, 100, 0, 100));
+        canvas.drawRRect(RRect.makeXYWH(renderPointC.x - 4, renderPointC.y - 4, 8, 8, 4), p);
+        // восстанавливаем исходный цвет рисования
+        p.setColor(paintColor);
+
+
+    }
+    /**
      * Рисование задачи
      *
      * @param canvas   область рисования
@@ -170,6 +206,17 @@ public class Task {
                 // рисуем окружность
                 float[] points = arrCircle(c.centre, c.radius);
                 canvas.drawLines(points, paint);
+            }
+            for(Ray r : rays){
+                paint.setColor(RAY_COLOR);
+                // y-координату разворачиваем, потому что у СК окна ось y направлена вниз,
+                // а в классическом представлении - вверх
+                Vector2i windowPos1 = windowCS.getCoords(r.pos1.x, r.pos1.y, ownCS);
+                Vector2i windowPos2 = windowCS.getCoords(r.pos2.x, r.pos2.y, ownCS);
+                // рисуем луч
+                // получаем максимальную длину отрезка на экране, как длину диагонали экрана
+                int maxDistance = (int) windowCS.getSize().length();
+                paintRay(canvas,windowPos1,windowPos2,paint,maxDistance);
             }
         }
 
@@ -321,6 +368,33 @@ public class Task {
         }
     }
     /**
+     * Добавить Луч
+     *
+     * @param pos1 положение первой точки
+     * @param pos2 положение второй точки
+     */
+    public void addRay(Vector2d pos1, Vector2d pos2) {
+        solved = false;
+        Ray newRay = new Ray(pos1,pos2 );
+        rays.add(newRay);
+        PanelLog.info("окружность " + newRay + " добавлена в задачу");
+    }
+
+    /**
+     * Добавить случайные лучи
+     *
+     * @param cnt кол-во случайных лучей
+     */
+    public void addRandomRays(int cnt) {
+        // повторяем заданное количество раз
+        for (int i = 0; i < cnt; i++) {
+            // получаем случайные координаты для двух точек
+            Vector2d pos1 = ownCS.getRandomCoords();
+            Vector2d pos2 = ownCS.getRandomCoords();
+            addRay(pos1, pos2);
+        }
+    }
+    /**
      * Очистить задачу
      */
     public void clear() {
@@ -332,8 +406,6 @@ public class Task {
      */
     public void solve() {
         // очищаем списки
-        crossed.clear();
-        single.clear();
 
         // перебираем пары точек
 //        for (int i = 0; i < points.size(); i++) {

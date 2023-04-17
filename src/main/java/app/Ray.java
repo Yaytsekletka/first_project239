@@ -29,17 +29,6 @@ public class Ray {
             this.pos2 = pos2;
         }
 
-
-        /**
-         * Получить цвет луча по её множеству
-         *
-         * @return цвет луча
-         */
-        @JsonIgnore
-        public int getColor() {
-            return  Misc.getColor(0xCC, 0x00, 0x00, 0xFF);
-        }
-
         /**
          * Получить положение
          * (нужен для json)
@@ -87,7 +76,7 @@ public class Ray {
             if (o == null || getClass() != o.getClass()) return false;
             // приводим переданный в параметрах объект к текущему классу
             app.Ray ray = (app.Ray) o;
-            return  Objects.equals(pos1, ray.pos1);
+            return  Objects.equals(pos1, ray.pos1) && Objects.equals(pos2, ray.pos2);
         }
 
         /**
@@ -99,6 +88,4 @@ public class Ray {
         public int hashCode() {
             return Objects.hash( pos1, pos2);
         }
-
-
 }

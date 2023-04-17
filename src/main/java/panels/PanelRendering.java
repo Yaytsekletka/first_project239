@@ -61,9 +61,11 @@ public class PanelRendering extends GridPanel {
         );
         fpsStats = new Stats();
         // создаём задачу без точек
-        task = new Task(cs, new ArrayList<>());
+        task = new Task(cs, new ArrayList<>(), new ArrayList<>());
         // добавляем в нё 10 случайных
-        task.addRandomCircles(10);
+        task.addRandomCircles(5);
+        // добавляем в нё 10 случайных
+        task.addRandomRays(5);
     }
 
     /**

@@ -79,6 +79,10 @@ public class Colors {
      */
     public static final int CIRCLE_COLOR = Misc.getColor(200, 0, 255, 255);
     /**
+     * Цвет лучей
+     */
+    public static final int RAY_COLOR = Misc.getColor(200, 100, 50, 255);
+    /**
      * Цвет заливки панели
      */
     public static final int SCROLLER_COLOR = Misc.getColor(255, 83, 38, 70);

@@ -74,6 +74,24 @@ public class Vector2i {
         return new Vector2i(a.x - b.x, a.y - b.y);
     }
 
+    /**
+     * Векторное умножение векторов
+     *
+     * @param v второй вектор
+     * @return результат умножения
+     */
+    public double cross(Vector2d v) {
+        return this.x * v.y - this.y * v.x;
+    }
+    /**
+     * Умножение вектора на число
+     *
+     * @param s число
+     */
+    public void mult( int s) {
+        this.x*=s;
+        this.y*=s;
+    }
 
     /**
      * Получить случайное значение в заданном диапазоне [min,max)

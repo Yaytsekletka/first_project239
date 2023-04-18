@@ -412,7 +412,19 @@ public class Task {
      * Решить задачу
      */
     public void solve() {
-        // очищаем списки
+        // выделяем область в которой будем раскидывать точки
+        int maxPosY=0;
+        int minPosY=0;
+        int maxPosX=0;
+        int minPosX=0;
+        // minPos крайняя левая точка области
+        //
+        for(Circle c : circles){
+            if(c.centre.x < (double) minPosX) minPosX=(int) c.centre.x +1;
+            if(c.centre.x > (double) maxPosX) maxPosX=(int) c.centre.x+1;
+            if(c.centre.y < (double) minPosY) minPosY=(int) c.centre.y+1;
+            if(c.centre.y > (double) maxPosY) maxPosY=(int) c.centre.y+1;
+        }
 
         // перебираем пары точек
 //        for (int i = 0; i < points.size(); i++) {

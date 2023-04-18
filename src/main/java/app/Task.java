@@ -169,18 +169,19 @@ public class Task {
         Vector2i renderPointD = Vector2i.sum(pos2, direction);
 
         // рисуем отрезки
+        float oldW = p.getStrokeWidth();
+        p.setStrokeWidth(3);
         canvas.drawLine(pos1.x, pos1.y, pos2.x, pos2.y, p);
         canvas.drawLine(pos1.x, pos1.y, renderPointC.x, renderPointC.y, p);
         canvas.drawLine(pos2.x, pos2.y, renderPointD.x, renderPointD.y, p);
+        p.setStrokeWidth(oldW);
         // сохраняем цвет рисования
         int paintColor = p.getColor();
         // задаём красный цвет
         p.setColor(Misc.getColor(200, 255, 0, 0));
         // рисуем исходные точки
-        canvas.drawRRect(RRect.makeXYWH(pos1.x - 4, pos1.y - 4, 8, 8, 4), p);
-        canvas.drawRRect(RRect.makeXYWH(pos2.x - 4, pos2.y - 4, 8, 8, 4), p);
-        p.setColor(Misc.getColor(200, 100, 0, 100));
-        canvas.drawRRect(RRect.makeXYWH(renderPointC.x - 4, renderPointC.y - 4, 8, 8, 4), p);
+        canvas.drawRRect(RRect.makeXYWH(pos1.x - 3, pos1.y - 3, 6, 6, 3), p);
+        canvas.drawRRect(RRect.makeXYWH(pos2.x - 3, pos2.y - 3, 6, 6, 3), p);
         // восстанавливаем исходный цвет рисования
         p.setColor(paintColor);
 
@@ -202,17 +203,20 @@ public class Task {
                 // а в классическом представлении - вверх
                 Vector2i windowPos = windowCS.getCoords(c.centre.x, c.centre.y, ownCS);
                 // рисуем точку
-                canvas.drawRect(Rect.makeXYWH(windowPos.x - POINT_SIZE, lastWindowCS.getMax().y - (windowPos.y + POINT_SIZE), POINT_SIZE*2 , POINT_SIZE*2 ), paint);
+                canvas.drawRRect( RRect.makeXYWH(windowPos.x - POINT_SIZE, lastWindowCS.getMax().y - (windowPos.y + POINT_SIZE), POINT_SIZE*2 , POINT_SIZE*2, POINT_SIZE ), paint);
+
                 // рисуем окружность
                 float[] points = arrCircle(c.centre, c.radius);
                 canvas.drawLines(points, paint);
             }
             for(Ray r : rays){
                 paint.setColor(RAY_COLOR);
-                // y-координату разворачиваем, потому что у СК окна ось y направлена вниз,
+
                 // а в классическом представлении - вверх
                 Vector2i windowPos1 = windowCS.getCoords(r.pos1.x, r.pos1.y, ownCS);
                 Vector2i windowPos2 = windowCS.getCoords(r.pos2.x, r.pos2.y, ownCS);
+                windowPos1.y= lastWindowCS.getMax().y - windowPos1.y;
+                windowPos2.y= lastWindowCS.getMax().y - windowPos2.y;
                 // рисуем луч
                 // получаем максимальную длину отрезка на экране, как длину диагонали экрана
                 int maxDistance = (int) windowCS.getSize().length();
@@ -399,6 +403,8 @@ public class Task {
      */
     public void clear() {
         //points.clear();
+        rays.clear();
+        circles.clear();
         solved = false;
     }
     /**

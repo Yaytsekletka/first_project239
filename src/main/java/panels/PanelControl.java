@@ -159,22 +159,25 @@ public class PanelControl extends GridPanel {
         });
         buttons.add(addCircle);
 
-        Button addToSecondSet = new Button(
+        Button addRay = new Button(
                 window, false, backgroundColor, PANEL_PADDING,
-                6, 9, 4, 4, 2, 2, "Добавить\n во второе\nмножество",
+                6, 9, 4, 4, 2, 2, "Добавить\n луч",
                 true, true);
-        addToSecondSet.setOnClick(() -> {
+        addRay.setOnClick(() -> {
             // если числа введены верно
-            if (!xField.hasValidDoubleValue()) {
+            if (!x1Field.hasValidDoubleValue() || !x2Field.hasValidDoubleValue()) {
                 PanelLog.warning("X координата введена неверно");
-            } else if (!yField.hasValidDoubleValue())
+            } else if (!y1Field.hasValidDoubleValue() || !y2Field.hasValidDoubleValue())
                 PanelLog.warning("Y координата введена неверно");
-            else {
+            else if (x1Field.doubleValue()==x2Field.doubleValue() && y1Field.doubleValue()==y2Field.doubleValue())
+                PanelLog.warning("Одинаковые координаты");
+            else{
                // PanelRendering.task.addPoint(
                    //     new Vector2d(xField.doubleValue(), yField.doubleValue()), Point.PointSet.SECOND_SET);
+                PanelRendering.task.addRay(new Vector2d(x1Field.doubleValue(), y1Field.doubleValue()),new Vector2d(x2Field.doubleValue(), y2Field.doubleValue()));
             }
         });
-        buttons.add(addToSecondSet);
+        buttons.add(addRay);
 
         // случайное добавление
         Label cntLabel = new Label(window, false, backgroundColor, PANEL_PADDING,
@@ -186,33 +189,32 @@ public class PanelControl extends GridPanel {
                 FIELD_TEXT_COLOR, true);
         inputs.add(cntField);
 
-        Button addPoints = new Button(
+        Button addRandomCircles = new Button(
                 window, false,backgroundColor, PANEL_PADDING,
-                6, 9, 2, 6, 2, 1, "Добавить\nслучайные окру",
+                6, 9, 2, 6, 2, 1, "Добавить\nслучайные окружности",
                 true, true);
-        addPoints.setOnClick(() -> {
+        addRandomCircles.setOnClick(() -> {
             // если числа введены верно
             if (!cntField.hasValidIntValue()) {
-                PanelLog.warning("кол-во точек указано неверно");
+                PanelLog.warning("кол-во указано неверно");
             } else {
-               // PanelRendering.task.addRandomPoints(cntField.intValue());
+                PanelRendering.task.addRandomCircles(cntField.intValue());
             }
         });
 
-        Button addRay = new Button(
+        Button addRandomRay = new Button(
                 window, false,backgroundColor, PANEL_PADDING,
                 6, 9, 4, 6, 2, 1, "Добавить\nслучайные лучи",
                 true, true);
-        addPoints.setOnClick(() -> {
+        addRandomRay.setOnClick(() -> {
             // если числа введены верно
             if (!cntField.hasValidIntValue()) {
                 PanelLog.warning("кол-во лучей указано неверно");
             } else
-            //PanelRendering.task.addRandomPoints(cntField.intValue());
-                System.out.println("добавление рандомных лучей");
+                PanelRendering.task.addRandomRays(cntField.intValue());
         });
-        buttons.add(addPoints);
-        buttons.add(addRay);
+        buttons.add(addRandomCircles);
+        buttons.add(addRandomRay);
 
         // управление
         Button load = new Button(

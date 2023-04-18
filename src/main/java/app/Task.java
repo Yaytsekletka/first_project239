@@ -217,6 +217,7 @@ public class Task {
                 Vector2i windowPos2 = windowCS.getCoords(r.pos2.x, r.pos2.y, ownCS);
                 windowPos1.y= lastWindowCS.getMax().y - windowPos1.y;
                 windowPos2.y= lastWindowCS.getMax().y - windowPos2.y;
+
                 // рисуем луч
                 // получаем максимальную длину отрезка на экране, как длину диагонали экрана
                 int maxDistance = (int) windowCS.getSize().length();

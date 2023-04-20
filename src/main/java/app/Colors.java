@@ -37,7 +37,7 @@ public class Colors {
     /**
      * Цвет пересечения
      */
-    public static final int CROSSED_COLOR = Misc.getColor(200, 0, 255, 255);
+    public static final int INVISIBLE_COLOR = Misc.getColor(100, 0, 0, 100);
     /**
      * Цвет разности
      */

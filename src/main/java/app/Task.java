@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static app.Colors.*;
+import static app.Point.PointSet.FIRST_SET;
 
 /**
  * Класс задачи
@@ -49,6 +50,10 @@ public class Task {
      */
     @Getter
     private final ArrayList<Ray> rays;
+    /**
+     * Список точек
+     */
+    private final ArrayList<Point> points;
 
     /**
      * Размер точки
@@ -84,13 +89,14 @@ public class Task {
     public Task(
             @JsonProperty("ownCS") CoordinateSystem2d ownCS,
             @JsonProperty("circles") ArrayList<Circle> circles,
-            @JsonProperty("circles") ArrayList<Ray> rays
+            @JsonProperty("circles") ArrayList<Ray> rays,
+             ArrayList<Point> points
 
     ) {
         this.ownCS = ownCS;
         this.circles = circles;
         this.rays = rays;
-
+        this.points=points;
     }
 
     /**
@@ -116,8 +122,6 @@ public class Task {
      * @return набор точек окружности
      */
     public float[] arrCircle(Vector2d centre, double rad) {
-
-
         // радиус вдоль оси x
         float radX = (float) (rad);
         // радиус вдоль оси y
@@ -144,8 +148,6 @@ public class Task {
             points[i * 4 + 3] = lastWindowCS.getMax().y - (float) tmp.y;
         }
         return points;
-
-
     }
     /**
      * Рисование луча
@@ -222,6 +224,14 @@ public class Task {
                 // получаем максимальную длину отрезка на экране, как длину диагонали экрана
                 int maxDistance = (int) windowCS.getSize().length();
                 paintRay(canvas,windowPos1,windowPos2,paint,maxDistance);
+            }
+            for (Point p : points) {
+                // y-координату разворачиваем, потому что у СК окна ось y направлена вниз,
+                // а в классическом представлении - вверх
+                Vector2i windowPos = windowCS.getCoords(p.pos.x, p.pos.y, ownCS);
+                // рисуем точку
+                paint.setColor(INVISIBLE_COLOR);
+                canvas.drawRRect(RRect.makeXYWH(windowPos.x - POINT_SIZE, windowPos.y - POINT_SIZE, POINT_SIZE * 2, POINT_SIZE * 2, POINT_SIZE), paint);
             }
         }
 
@@ -413,6 +423,34 @@ public class Task {
         }
     }
     /**
+     * Добавить точку
+     *
+     * @param pos      положение
+     */
+    public void addPoint(Vector2d pos) {
+        solved = false;
+        Point newPoint = new Point(pos, FIRST_SET);
+        points.add(newPoint);
+        PanelLog.info("точка " + newPoint + " добавлена в " + newPoint.getSetName());
+    }
+    /**
+     * Добавить случайные точки
+     *
+     * @param cnt кол-во случайных точек
+     */
+    public void addRandomPoints(int cnt) {
+        CoordinateSystem2i addGrid = new CoordinateSystem2i(300, 300);
+        for (int i = 0; i < cnt; i++) {
+            Vector2i gridPos = addGrid.getRandomCoords();
+            Vector2d pos = ownCS.getCoords(gridPos, addGrid);
+            // сработает примерно в половине случаев
+            if (ThreadLocalRandom.current().nextBoolean())
+                addPoint(pos);
+            else
+                addPoint(pos);
+        }
+    }
+    /**
      * Очистить задачу
      */
     public void clear() {
@@ -421,22 +459,74 @@ public class Task {
         circles.clear();
         solved = false;
     }
+    public static boolean pointInRectangle(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, double x, double y) {
+        // уравнения прямых, проходящих через каждую сторону прямоугольника
+        double a1 = y2 - y1;
+        double b1 = x1 - x2;
+        double c1 = x2*y1 - x1*y2;
+
+        double a2 = y3 - y2;
+        double b2 = x2 - x3;
+        double c2 = x3*y2 - x2*y3;
+
+        double a3 = y4 - y3;
+        double b3 = x3 - x4;
+        double c3 = x4*y3 - x3*y4;
+
+        double a4 = y1 - y4;
+        double b4 = x4 - x1;
+        double c4 = x1*y4 - x4*y1;
+
+        // проверка принадлежности точки каждой стороне прямоугольника
+        boolean side1 = a1*x + b1*y + c1 <= 0;
+        boolean side2 = a2*x + b2*y + c2 <= 0;
+        boolean side3 = a3*x + b3*y + c3 <= 0;
+        boolean side4 = a4*x + b4*y + c4 <= 0;
+
+        // точка находится внутри прямоугольника, если она находится с одной стороны от каждой стороны прямоугольника
+        return side1 == side2 && side2 == side3 && side3 == side4;
+    }
     /**
      * Решить задачу
      */
     public void solve() {
         // выделяем область в которой будем раскидывать точки
-        int maxPosY=0;
-        int minPosY=0;
-        int maxPosX=0;
-        int minPosX=0;
+        addRandomPoints(5000);
+        //int minPosX=0,minPosY=0,maxPosX=0,maxPosY=0;
         // minPos крайняя левая точка области
         //
-        for(Circle c : circles){
-            if(c.centre.x < (double) minPosX) minPosX=(int) c.centre.x +1;
-            if(c.centre.x > (double) maxPosX) maxPosX=(int) c.centre.x+1;
-            if(c.centre.y < (double) minPosY) minPosY=(int) c.centre.y+1;
-            if(c.centre.y > (double) maxPosY) maxPosY=(int) c.centre.y+1;
+//        for(Circle c : circles){
+//            if(c.centre.x < (double) minPosX) minPosX=(int) c.centre.x +1;
+//            if(c.centre.x > (double) maxPosX) maxPosX=(int) c.centre.x+1;
+//            if(c.centre.y < (double) minPosY) minPosY=(int) c.centre.y+1;
+//            if(c.centre.y > (double) maxPosY) maxPosY=(int) c.centre.y+1;
+//        }
+        int [][] myarr = new int[circles.size()][rays.size()];
+        for (int i=0;i < points.size();i++) {
+            Point p = points.get(i);
+            for (int j=0;j < circles.size();j++) {
+                Circle c = circles.get(j);
+                for (int x=0;x < rays.size();x++) {
+                    Ray r = rays.get(x);
+                    boolean isInCircle=false;
+                    boolean isInRay=false;
+                    if(Math.sqrt((p.pos.x-c.centre.x)*(p.pos.x-c.centre.x) + (p.pos.y-c.centre.y)*(p.pos.y-c.centre.y))<c.radius){
+                        isInCircle=true;
+                    }
+                    Vector2d pos1 = r.pos1;
+                    Vector2d pos2 = r.pos2;
+                    int maxDist = 100;
+                    Vector2d dir = new Vector2d(r.pos2.x-r.pos1.x,r.pos2.y-r.pos1.y);
+                    dir = dir.rotated(Math.PI/2).norm();
+                    dir.mult(maxDist);
+                    Vector2i direction = new Vector2i((int)dir.x,(int)dir.y);
+                    Vector2d renderPointC = Vector2d.sum(r.pos1, dir);
+                    Vector2d renderPointD = Vector2d.sum(r.pos2, dir);
+
+                    isInRay = pointInRectangle(pos1.x,pos1.y,pos2.x,pos2.y,renderPointD.x,renderPointD.y,renderPointC.x,renderPointC.y,p.pos.x,p.pos.y);
+                    if(isInRay)myarr[j][x]++;
+                }
+            }
         }
 
         // перебираем пары точек
@@ -468,6 +558,7 @@ public class Task {
      */
     public void cancel() {
          solved = false;
+         points.clear();
     }
     /**
      * проверка, решена ли задача

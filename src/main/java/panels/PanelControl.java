@@ -249,13 +249,13 @@ public class PanelControl extends GridPanel {
             if (!PanelRendering.task.isSolved()) {
                 PanelRendering.task.solve();
                 String s = "Задача решена\n";
-                PanelInfo.show(s + "\n\nНажмите Esc, чтобы вернуться");
+               // PanelInfo.show(s + "\n\nНажмите Esc, чтобы вернуться");
                 PanelLog.success(s);
                 solve.text = "Сбросить";
             } else {
                 cancelTask();
             }
-            window.requestFrame();
+            //window.requestFrame();
         });
         buttons.add(solve);
 

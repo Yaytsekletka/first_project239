@@ -322,6 +322,9 @@ public class Task {
         return ownCS.getCoords(x, y, windowCS);
     }
 
+    
+    Vector2d prevClickPos = null;
+
     /**
      * Клик мыши по пространству задачи
      *
@@ -334,15 +337,25 @@ public class Task {
         Vector2i pos1 = new Vector2i(pos.x, lastWindowCS.getMax().y - pos.y);
         // получаем положение на экране
         Vector2d taskPos = ownCS.getCoords(pos1, lastWindowCS);
-        // если левая кнопка мыши, добавляем в первое множество
-        double tmpR = ThreadLocalRandom.current().nextDouble(0, Math.min(ownCS.getSize().x, ownCS.getSize().y) / 2);
-        if (mouseButton.equals(MouseButton.PRIMARY)) {
-           // addPoint(taskPos, Point.PointSet.FIRST_SET);
-            addCircle(taskPos, tmpR);
-            // если правая, то во второе
-        } else if (mouseButton.equals(MouseButton.SECONDARY)) {
-           // addPoint(taskPos, Point.PointSet.SECOND_SET);
+        if (prevClickPos!=null && (taskPos.x!=prevClickPos.x||taskPos.y!=prevClickPos.y)) {
+            // если левая кнопка мыши, добавляем в первое множество
+            //double tmpR = ThreadLocalRandom.current().nextDouble(0, Math.min(ownCS.getSize().x, ownCS.getSize().y) / 2);
+            if (mouseButton.equals(MouseButton.PRIMARY)) {
+                // pos, prevClickPos
+                // addPoint(taskPos, Point.PointSet.FIRST_SET);
+                double tmpR = Math.sqrt((taskPos.x-prevClickPos.x)*(taskPos.x-prevClickPos.x)+(taskPos.y-prevClickPos.y)*(taskPos.y-prevClickPos.y));
+                addCircle(prevClickPos, tmpR);
+                prevClickPos=null;
+                // если правая, то во второе
+            } else if (mouseButton.equals(MouseButton.SECONDARY)) {
+                // addPoint(taskPos, Point.PointSet.SECOND_SET);
+                addRay(prevClickPos,taskPos);
+                prevClickPos=null;
+            }
+        }else {
+            prevClickPos = taskPos;
         }
+
     }
     /**
      * Добавить окружность

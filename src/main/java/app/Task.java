@@ -53,8 +53,12 @@ public class Task {
     /**
      * Список точек
      */
+    @Getter
     private final ArrayList<Point> points;
-
+    /**
+     * Полигон
+     */
+    private final polygon poly;
     /**
      * Размер точки
      */
@@ -90,13 +94,15 @@ public class Task {
             @JsonProperty("ownCS") CoordinateSystem2d ownCS,
             @JsonProperty("circles") ArrayList<Circle> circles,
             @JsonProperty("circles") ArrayList<Ray> rays,
-             ArrayList<Point> points
+             ArrayList<Point> points,
+            polygon poly
 
     ) {
         this.ownCS = ownCS;
         this.circles = circles;
         this.rays = rays;
         this.points=points;
+        this.poly = poly;
     }
 
     /**
@@ -233,6 +239,10 @@ public class Task {
                 paint.setColor(INVISIBLE_COLOR);
                 canvas.drawRRect(RRect.makeXYWH(windowPos.x - POINT_SIZE, windowPos.y - POINT_SIZE, POINT_SIZE * 2, POINT_SIZE * 2, POINT_SIZE), paint);
             }
+            if(solved){
+                poly.paint(canvas,paint);
+            }
+
         }
 
         canvas.restore();
@@ -528,7 +538,36 @@ public class Task {
                 }
             }
         }
+        int posCircleMax=0;
+        int posRayMax=0;
+        int max=0;
+        for(int i = 0; i < circles.size(); i++){
+            for(int j = 0; j < rays.size(); j++){
+               if(max < myarr[i][j]){
+                   posCircleMax=i;
+                   posRayMax=j;
+               }
+            }
+        }
+        System.out.println("posRayMax:"+posRayMax);
+        Circle ansCircle = circles.get(posCircleMax);
+        Ray ansRay = rays.get(posRayMax);
+        Vector2d dir = new Vector2d(ansRay.pos2.x-ansRay.pos1.x,ansRay.pos2.y-ansRay.pos1.y);
+        dir = dir.rotated(Math.PI/2).norm();
+        int maxDist=100;
+        dir.mult(maxDist);
 
+        Vector2d renderPointC = Vector2d.sum(ansRay.pos1, dir);
+        Vector2d renderPointD = Vector2d.sum(ansRay.pos2, dir);
+        Vector2i pos1 = lastWindowCS.getCoords(ansRay.pos1.x,ansRay.pos1.y, ownCS); //
+        Vector2i pos2 = lastWindowCS.getCoords(ansRay.pos2.x,ansRay.pos2.y, ownCS);
+        Vector2i pos3 = lastWindowCS.getCoords(renderPointC.x,renderPointC.y, ownCS);
+        Vector2i pos4 = lastWindowCS.getCoords(renderPointD.x,renderPointD.y, ownCS);
+        poly.add(pos1.x,lastWindowCS.getMax().y - pos1.y,Misc.getColor(100,200,200,0));
+        poly.add(pos2.x,lastWindowCS.getMax().y - pos2.y,Misc.getColor(100,200,200,0));
+        poly.add(pos3.x,lastWindowCS.getMax().y - pos3.y,Misc.getColor(100,200,200,0));
+        poly.add(pos4.x,lastWindowCS.getMax().y - pos4.y,Misc.getColor(100,200,200,0));
+        poly.calculate();
         // перебираем пары точек
 //        for (int i = 0; i < points.size(); i++) {
 //            for (int j = i + 1; j < points.size(); j++) {
@@ -559,6 +598,7 @@ public class Task {
     public void cancel() {
          solved = false;
          points.clear();
+         poly.clear();
     }
     /**
      * проверка, решена ли задача

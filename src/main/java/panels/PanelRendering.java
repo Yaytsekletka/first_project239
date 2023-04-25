@@ -3,6 +3,7 @@ package panels;
 import Misc.Stats;
 import app.Point;
 import app.Task;
+import app.polygon;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dialogs.PanelSelectFile;
 import io.github.humbleui.jwm.Event;
@@ -33,7 +34,7 @@ public class PanelRendering extends GridPanel {
     /**
      * Статистика fps
      */
-    private final Stats fpsStats;
+    //private final Stats fpsStats;
 
     /**
      * Панель управления
@@ -59,9 +60,9 @@ public class PanelRendering extends GridPanel {
         CoordinateSystem2d cs = new CoordinateSystem2d(
                 new Vector2d(-10.0, -10.0), new Vector2d(10.0, 10.0)
         );
-        fpsStats = new Stats();
+        //fpsStats = new Stats();
         // создаём задачу без точек
-        task = new Task(cs, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        task = new Task(cs, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new polygon());
         // добавляем в нё 10 случайных
         task.addRandomCircles(5);
         // добавляем в нё 10 случайных
@@ -154,7 +155,7 @@ public class PanelRendering extends GridPanel {
         // рисуем задачу
         task.paint(canvas, windowCS);
         // рисуем статистику фпс
-        fpsStats.paint(canvas, windowCS, FONT12, padding);
+        //fpsStats.paint(canvas, windowCS, FONT12, padding);
         // рисуем перекрестие, если мышь внутри области рисования этой панели
         if (lastInside && lastMove != null)
             task.paintMouse(canvas, windowCS, FONT12, lastWindowCS.getRelativePos(lastMove));
